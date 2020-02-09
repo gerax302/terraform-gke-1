@@ -1,0 +1,11 @@
+project = "your-gcp-project"
+name  = "your-cluster-name"
+location = "us-central1"
+
+initial_node_count = 1
+machine_type = "n1-standard-1"
+name-node-pool = "demo-pool"
+
+count=2
+
+

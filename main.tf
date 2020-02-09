@@ -1,3 +1,8 @@
+terraform {
+  # Require Terraform 0.12
+  required_version = ">= 0.12.7"
+}
+
 provider "google" {
   credentials = file("/Users/gerardorosales/Downloads/gcproject-test-sa-tf.json")
   #this SA is for terraform, the other for px
@@ -16,16 +21,6 @@ resource "google_container_cluster" "default" {
   # we too poor
   logging_service = "none"
   monitoring_service = "none"
-  addons_config {
-    # load balancing too expensive
-    http_load_balancing {
-      disabled = true
-    }
-    # who needs it
-    kubernetes_dashboard {
-      disabled = true
-    }
-  }
 
   # We can't create a cluster with no node pool defined, but we want to only use
   # separately managed node pools. So we create the smallest possible default
@@ -68,7 +63,7 @@ resource "google_container_node_pool" "default" {
     preemptible  = true
     machine_type = var.machine_type
     disk_size_gb = 10
-
+    image_type = "ubuntu"
     metadata = {
       disable-legacy-endpoints = "true"
     }
@@ -88,16 +83,4 @@ resource "google_container_node_pool" "default" {
 
 }
 
-# The following outputs allow authentication and connectivity to the GKE Cluster
-# by using certificate-based authentication.
-output "client_certificate" {
-  value = "${google_container_cluster.primary.master_auth.0.client_certificate}"
-}
 
-output "client_key" {
-  value = "${google_container_cluster.primary.master_auth.0.client_key}"
-}
-
-output "cluster_ca_certificate" {
-  value = "${google_container_cluster.primary.master_auth.0.cluster_ca_certificate}"
-}
