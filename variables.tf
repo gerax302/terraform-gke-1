@@ -2,7 +2,7 @@ variable "name" {
   default = "demo-cluster"
 }
 variable "project" {
-  default = "optimum-spring-238818"
+  default = "test"
 }
 
 variable "location" {
@@ -11,8 +11,13 @@ variable "location" {
 
 variable "initial_node_count" {
   default = 1
+  # up number multiplied by 3...3 zones for us-central
 }
 
 variable "machine_type" {
   default = "n1-standard-1"  
+}
+
+variable "name-node-pool" {
+
 }

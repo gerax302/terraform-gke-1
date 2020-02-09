@@ -1,2 +1,6 @@
 *.tfstate*
 .terraform/
+*.tfvars
+*.auto.tfvars
+.json
+.SA
