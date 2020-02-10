@@ -3,4 +3,5 @@
 *.tfvars
 *.auto.tfvars
 .json
+*.json
 .SA

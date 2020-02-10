@@ -4,7 +4,7 @@ terraform {
 }
 
 provider "google" {
-  credentials = file("/Users/gerardorosales/Downloads/gcproject-test-sa-tf.json")
+  credentials = file("./gcproject-test-sa-tf.json")
   #this SA is for terraform, the other for px
   project     = var.project
   region      = var.location
@@ -68,9 +68,10 @@ resource "google_container_node_pool" "default" {
       disable-legacy-endpoints = "true"
     }
 
+
     oauth_scopes = [
       "https://www.googleapis.com/auth/compute",
-      "https://www.googleapis.com/auth/devstorage.read_only",
+      "https://www.googleapis.com/auth/devstorage.read_write",
       "https://www.googleapis.com/auth/logging.write",
       "https://www.googleapis.com/auth/monitoring",
     ]
@@ -78,7 +79,7 @@ resource "google_container_node_pool" "default" {
 
   management {
     auto_repair = true
-    auto_upgrade = true
+    auto_upgrade = false
   }
 
 }
