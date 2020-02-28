@@ -6,27 +6,27 @@ terraform {
 provider "google" {
   credentials = file("./gcproject-test-sa-tf.json")
   #this SA is for terraform, the other for px
-  project     = var.project
-  region      = var.location
+  project = var.project
+  region  = var.location
 }
 
 resource "google_container_cluster" "default" {
-  name        = var.name
+  name = var.name
   #name   = "my-poor-gke-cluster"
-  project     = var.project
-  description = "Demo GKE Cluster"
-  location    = var.location
+  project            = var.project
+  description        = "Test GKE Cluster"
+  location           = var.location
   min_master_version = 1.14
 
   # we too poor
-  logging_service = "none"
+  logging_service    = "none"
   monitoring_service = "none"
 
   # We can't create a cluster with no node pool defined, but we want to only use
   # separately managed node pools. So we create the smallest possible default
   # node pool and immediately delete it.
   remove_default_node_pool = true
-  initial_node_count = var.initial_node_count
+  initial_node_count       = var.initial_node_count
 
   # Setting an empty username and password explicitly disables basic auth
   master_auth {
@@ -52,9 +52,9 @@ resource "google_container_cluster" "default" {
 }
 
 resource "google_container_node_pool" "default" {
-  name       = var.name-node-pool
+  name = var.name-node-pool
   #name       = "my-poor-node-pool"
-  project     = var.project
+  project    = var.project
   location   = var.location
   cluster    = google_container_cluster.default.name
   node_count = var.initial_node_count
@@ -62,8 +62,8 @@ resource "google_container_node_pool" "default" {
   node_config {
     preemptible  = true
     machine_type = var.machine_type
-    disk_size_gb = 10
-    image_type = "ubuntu"
+    disk_size_gb = 20
+    image_type   = "ubuntu"
     metadata = {
       disable-legacy-endpoints = "true"
     }
@@ -78,10 +78,19 @@ resource "google_container_node_pool" "default" {
   }
 
   management {
-    auto_repair = true
+    auto_repair  = true
     auto_upgrade = false
   }
 
+  provisioner "local-exec" {
+    command = "echo local-exec-provisioner-section; sleep 10;"
+    # nodePxMetadata=$(kc get node | awk 'NR==2{print $1}')
+    # kubectl label node $nodePxMetadata px/metadata-node=true
+
+  }
+
+  provisioner "local-exec" {
+    command = "gcloud container clusters get-credentials demo-cluster --region us-central1 --project gcproject-test"
+  }
+
 }
-
-
