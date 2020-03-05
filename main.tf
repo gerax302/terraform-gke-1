@@ -8,16 +8,18 @@ provider "google" {
   #this SA is for terraform, the other for px
   project = var.project
   region  = var.location
+  zone = var.zone
 }
 
 resource "google_container_cluster" "default" {
   name = var.name
   #name   = "my-poor-gke-cluster"
-  project            = var.project
-  description        = "Test GKE Cluster"
-  location           = var.location
+  project          = var.project
+  description      = "Test GKE Cluster"
+  #location         = var.location
+  location         = var.zone
   min_master_version = 1.14
-
+  network = google_compute_network.default.name
   # we too poor
   logging_service    = "none"
   monitoring_service = "none"
@@ -55,19 +57,20 @@ resource "google_container_node_pool" "default" {
   name = var.name-node-pool
   #name       = "my-poor-node-pool"
   project    = var.project
-  location   = var.location
+  #location   = var.location
+  location   = var.zone
   cluster    = google_container_cluster.default.name
   node_count = var.initial_node_count
+  version    = "1.14.10"
 
   node_config {
     preemptible  = true
     machine_type = var.machine_type
-    disk_size_gb = 20
+    disk_size_gb = 15
     image_type   = "ubuntu"
     metadata = {
       disable-legacy-endpoints = "true"
     }
-
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/compute",
@@ -83,14 +86,17 @@ resource "google_container_node_pool" "default" {
   }
 
   provisioner "local-exec" {
-    command = "echo local-exec-provisioner-section; sleep 10;"
-    # nodePxMetadata=$(kc get node | awk 'NR==2{print $1}')
-    # kubectl label node $nodePxMetadata px/metadata-node=true
-
+    command = "echo 'local-exec-provisioner-section'; sleep 10;"
+    # nodePxMetadata=$(kc get node | awk 'NR==2{print $1}'); kubectl label node $nodePxMetadata px/metadata-node=true
   }
 
   provisioner "local-exec" {
-    command = "gcloud container clusters get-credentials demo-cluster --region us-central1 --project gcproject-test"
+    # Regional
+    # command = "gcloud container clusters get-credentials demo-cluster --region us-central1 --project gcproject-test"
+    # Zonal
+    command ="gcloud container clusters get-credentials demo-cluster --zone us-central1-c --project gcproject-test"
   }
 
 }
+
+

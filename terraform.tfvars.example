@@ -1,6 +1,8 @@
 project = "your-gcp-project"
 name  = "your-cluster-name"
 location = "us-central1"
+zone = "us-central1-c"
+
 
 initial_node_count = 1
 machine_type = "n1-standard-1"
